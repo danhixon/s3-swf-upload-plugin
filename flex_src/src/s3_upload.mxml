@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="registerCallbacks();" layout="absolute" height="35" width="300">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" backgroundGradientColors="[0xFAFAFA, 0xD0D0D0]" creationComplete="registerCallbacks();" layout="absolute" height="100" width="320">
 
     <mx:Script>
     	<![CDATA[
@@ -31,7 +31,7 @@
 			
 			private function browser():void {
 			    this.fileReference = new FileReference();
-			    
+			    textInput.setStyle("color","#222222");
 			    // setup file reference event handlers
 			    fileReference.addEventListener(Event.CANCEL, function(event:Event):void {
 			        // TODO: cancel the upload.
@@ -59,7 +59,7 @@
 			
 			private function upload(prefixPath:String = ""):void {
 			    
-			    // return if user not selected any file
+			    // return if user has not selected any file
 			    if (options.FileSize == null) {
 			    	trace(options.onSuccessCall);
 			        ExternalInterface.call(options.onSuccessCall);
@@ -109,7 +109,19 @@
 			    options.acl            = xml.acl;
 			    options.Expires        = xml.expirationdate;
 			    options.Secure         = xml.https;
-			    
+				
+				if (xml.errorMessage!="")
+				{
+				 	uploadProgressBar.visible = false;
+				  	selectButton.visible = true;
+					textInput.visible = true;
+				  	textInput.text = "Error: " + xml.errorMessage;
+					textInput.setStyle("color","#770000");
+					ExternalInterface.call(options.onSuccessCall);
+					//Application.application.statusBar.status = "Hello World..."; 
+					//throw new Error("Error: " + xml.errorMessage);
+					return;
+				}
 			    // ===================== //
 			    // Start post file to S3 //
 			    // ===================== //
@@ -118,7 +130,7 @@
 			    request.addEventListener(Event.OPEN, function(event:Event):void {
 			        textInput.text = "Uploading...";
 			        uploadProgressBar.visible = true;
-			        selectButton.enabled = false;
+			        selectButton.visible = false;
 			        trace(event);
 			    });
 			    request.addEventListener(ProgressEvent.PROGRESS, function(event:ProgressEvent):void {
@@ -128,7 +140,7 @@
 			    });
 			    request.addEventListener(IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):void {
 			        uploadProgressBar.visible = false;
-			        selectButton.enabled = true;
+			        selectButton.visible = true;
 			        textInput.text = "Upload error!";
 			        trace(options.onFailedCall);
 			        ExternalInterface.call(options.onFailedCall);
@@ -136,7 +148,7 @@
 			    });
 			    request.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(event:SecurityErrorEvent):void {
 			        uploadProgressBar.visible = false;
-			        selectButton.enabled = true;
+			        selectButton.visible = true;
 			        textInput.text = "Upload error!";
 			        trace(options.onFailedCall);
 			        ExternalInterface.call(options.onFailedCall);
@@ -144,7 +156,7 @@
 			    });
 			    request.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, function(event:Event):void {
 			        uploadProgressBar.visible = false;
-			        selectButton.enabled = true;
+			        //selectButton.visible = true;
 			        textInput.text = "Upload complete!";
 			        trace(options.onSuccessCall);
 			        ExternalInterface.call(options.onSuccessCall);
@@ -155,8 +167,9 @@
 			        request.upload(fileReference);
 			    } catch(e:Error) {
 			        uploadProgressBar.visible = false;
-			        selectButton.enabled = true;
-			        textInput.text = "Upload exception!";
+			        selectButton.visible = true;
+			        textInput.text = "" + e;
+					textInput.setStyle("color","#770000");
 			        trace("An error occurred: " + e);
 			    }
 			}
@@ -180,8 +193,8 @@
     	]]>
     </mx:Script>
     
-    <mx:Label x="10" y="10" id="textInput" color="#FFFFFF" fontWeight="bold" text="Click the Select File Button... "/>
-    <mx:Button x="227" y="7" label="Select" click="browser()" id="selectButton"/>
-    <mx:ProgressBar x="10" y="7" width="200" height="20" labelPlacement="center" id="uploadProgressBar" visible="false" mode="manual" label="Uploading..."/>
+    <mx:Label x="100" y="10" id="textInput" color="#222222" fontWeight="bold" text=""/>
+    <mx:Button x="10" y="7" label="Browse..." click="browser()" id="selectButton"/>
+    <mx:ProgressBar x="10" y="7" width="300" height="20" labelPlacement="center" id="uploadProgressBar" visible="false" mode="manual" label="Uploading..."/>
     
 </mx:Application>

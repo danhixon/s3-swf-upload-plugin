@@ -2,13 +2,16 @@ development:
   bucket_name: development_bucket
   access_key_id: 
   secret_access_key: 
-
+  max_file_size: 10485760
+    
 test:
   bucket_name: test_bucket
   access_key_id: 
   secret_access_key: 
-
+  max_file_size: 10485760
+  
 production:
   bucket_name: production_bucket
   access_key_id: 
   secret_access_key: 
+  max_file_size: 10485760

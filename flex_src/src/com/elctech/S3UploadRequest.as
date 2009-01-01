@@ -53,7 +53,7 @@ package com.elctech {
 
             var canUseVanityStyle:Boolean = canUseVanityStyle(_bucket);
             
-            if(_options.Secure && canUseVanityStyle && _bucket.match(/\./)) {
+            if(_options.Secure!="false" && canUseVanityStyle && _bucket.match(/\./)) {
                 // We cannot use SSL for bucket names containing "."
                 // The certificate won't match "my.bucket.s3.amazonaws.com"
                 throw new SecurityError("Cannot use SSL with bucket name containing '.': " + _bucket);
@@ -212,7 +212,7 @@ package com.elctech {
             }
         }
 		
-		 private function isError(responseText:String):Boolean {
+		private function isError(responseText:String):Boolean {
             var xml:XMLDocument = new XMLDocument();
             xml.ignoreWhite = true;
             xml.parseXML(responseText);
@@ -223,6 +223,7 @@ package com.elctech {
             }
             return true;
         }
+
 	}
 	
 }
